@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>HOPE Carousel</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .carousel {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 5 / 1;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* ARROWS */
+
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+
+      width: 40px;
+      height: 40px;
+
+      border: none;
+      border-radius: 50%;
+
+      background: rgba(0, 0, 0, 0.25);
+      color: white;
+
+      font-size: 22px;
+      line-height: 40px;
+      text-align: center;
+
+      cursor: pointer;
+
+      opacity: 0;
+      transition: opacity 0.25s ease, background 0.25s ease;
+    }
+
+    .carousel:hover .arrow {
+      opacity: 1;
+    }
+
+    .arrow:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .prev {
+      left: 14px;
+    }
+
+    .next {
+      right: 14px;
+    }
+
+    /* Show arrows on touch/mobile devices */
+
+    @media (hover: none) {
+      .arrow {
+        opacity: 0.75;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .arrow {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 16px;
+      }
+
+      .prev {
+        left: 7px;
+      }
+
+      .next {
+        right: 7px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="carousel" id="hopeCarousel">
+
+    <!-- IMAGE 1 -->
+    <div class="slide active">
+      <img
+        src="https://www.hopeforhemophilia.org/uploads/5/5/8/3/55834883/hwfaihbfus_orig.png"
+        alt="HOPE"
+      >
+    </div>
+
+    <!-- IMAGE 2 -->
+    <div class="slide">
+      <img
+        src="https://www.hopeforhemophilia.org/uploads/5/5/8/3/55834883/dvgsagjvfhb_orig.png"
+        alt="HOPE"
+      >
+    </div>
+
+    <!-- IMAGE 3 -->
+    <div class="slide">
+      <img
+        src="https://www.hopeforhemophilia.org/uploads/5/5/8/3/55834883/hfwuaobfnj_orig.png"
+        alt="HOPE"
+      >
+    </div>
+
+    <!-- ARROWS -->
+    <button class="arrow prev" aria-label="Previous slide">&#10094;</button>
+    <button class="arrow next" aria-label="Next slide">&#10095;</button>
+
+  </div>
+
+
+  <script>
+    const carousel = document.getElementById("hopeCarousel");
+    const slides = carousel.querySelectorAll(".slide");
+    const nextButton = carousel.querySelector(".next");
+    const prevButton = carousel.querySelector(".prev");
+
+    let currentSlide = 0;
+    let timer;
+
+
+    function showSlide(index) {
+
+      slides[currentSlide].classList.remove("active");
+
+      currentSlide = (index + slides.length) % slides.length;
+
+      slides[currentSlide].classList.add("active");
+    }
+
+
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+
+    function previousSlide() {
+      showSlide(currentSlide - 1);
+    }
+
+
+    /* AUTOPLAY */
+
+    function startTimer() {
+
+      timer = setInterval(function () {
+        nextSlide();
+      }, 5000);
+
+    }
+
+
+    function restartTimer() {
+
+      clearInterval(timer);
+
+      startTimer();
+
+    }
+
+
+    /* ARROW CONTROLS */
+
+    nextButton.addEventListener("click", function () {
+
+      nextSlide();
+
+      restartTimer();
+
+    });
+
+
+    prevButton.addEventListener("click", function () {
+
+      previousSlide();
+
+      restartTimer();
+
+    });
+
+
+    /* MOBILE SWIPE */
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+
+    carousel.addEventListener(
+      "touchstart",
+      function (event) {
+
+        touchStartX =
+          event.changedTouches[0].screenX;
+
+      },
+      { passive: true }
+    );
+
+
+    carousel.addEventListener(
+      "touchend",
+      function (event) {
+
+        touchEndX =
+          event.changedTouches[0].screenX;
+
+        const difference =
+          touchStartX - touchEndX;
+
+
+        if (Math.abs(difference) < 40) {
+          return;
+        }
+
+
+        if (difference > 0) {
+
+          nextSlide();
+
+        } else {
+
+          previousSlide();
+
+        }
+
+
+        restartTimer();
+
+      },
+      { passive: true }
+    );
+
+
+    /* START */
+
+    startTimer();
+
+  </script>
+
+</body>
+</html>
